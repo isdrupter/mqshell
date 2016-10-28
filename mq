@@ -26,15 +26,15 @@ if [[ ! -d $piddir ]]; then mkdir $piddir ;fi
 if [[ ! -f $errorlog ]]; then >$errorlog ;fi
 if [[ ! -p $pipe ]]; then mkfifo $pipe ;fi
 # children should inherit these for easy api scripting
-export mq_host=${1:-"connecttothis.dynu.com"}
+export mq_host=${1:-"localhost"}
 export mq_pass=${2:-"x"}
 export mq_path=${3:-"/usr/sbin:/bin:/usr/bin:/sbin:/var/bin"}
 export mq_debug=${4:-"0"}
-export mq_intf=${5:-"eth1"}
+export mq_intf=${5:-"lo"}
 export mq_subtop=${6:-"bot"}
 export mq_pubtop=${7:-"jsh"}
-export mq_httphost=${8:-"connecttothis.dynu.com"}
-export mq_ipthost=${9:-"connecttothat.dynu.com"}
+export mq_httphost=${8:-"localhost"}
+export mq_ipthost=${9:-"localhost"}
 export mq_binpath=${10:-"/var/bin"}
 mq_ip=$(/sbin/ifconfig $mq_intf | grep Mask | cut -d ':' -f2 | cut -d " " -f1)
 export mq_ip="$mq_ip"
