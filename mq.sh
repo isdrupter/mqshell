@@ -80,7 +80,7 @@ while true; do
   mqhash="$(echo $(cat /tmp/mq-funx.sha1))"
   if (echo $mqhash *$mq_binpath/mq-funx | sha1sum -c -) > /dev/null 2>&1 ; then
      $mq_debug && echo '[*] Hash matches, will source and exec...'
-     source "$mq_binpath/mq-funx"
+     source "$mq_binpath/mq-funx.sh"
      break
   else
     secs="$(echo $RANDOM|head -c 2)"
