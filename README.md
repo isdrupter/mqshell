@@ -24,7 +24,7 @@ systems, and also to be as posix-compliant as possible, ie, it should run on jus
 - Some Coreutils applications like echo, a shell with printf, base64, head, sed, grep, sleep, sha1sum, md5sum, etc
 - mosquitto_sub/pub (pubclient/subclient)
 - An http server to host the mq-funx files. This is for easy, dynamic, remote updates.
-- An mqtt server. I prefer [mosca](https://github.com/mcollina/mosca
+- An mqtt server. I prefer [mosca](https://github.com/mcollina/mosca)
 - A **lot** of patience
 
 ## Why? 
