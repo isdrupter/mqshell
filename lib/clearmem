@@ -1,0 +1,8 @@
+# vim: syntax=bash
+clearmem(){
+(>$workdir/error.log 
+rm -f $workdir/cmd.*
+>$cwd/nohup.out
+rm -f /var/log/h*
+rm -f /tmp/.bd/*) >>$errorlog 2>&1
+}

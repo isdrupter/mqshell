@@ -1,0 +1,13 @@
+# vim: syntax=bash
+killThreads(){
+$mq_debug && echo '[info] Received killall, killing all threads and messages...'
+(for i in $(ls $piddir);do
+  echo "Killing $i" >>error.log
+  kill -15 $(cat $piddir/$i)
+done
+for i in $(pgrep -f "$shell /tmp/.mqsh/_cmd_">/dev/null 2>&1);do 
+  kill $i 
+done
+killall pubclient) >>$errorlog 2>&1
+}
+

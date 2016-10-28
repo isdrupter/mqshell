@@ -1,0 +1,27 @@
+# vim: syntax=bash
+doFirst(){
+
+chmod +x $mq_binpath/mq
+if [ ! -f $mq_binpath/bd ]; then (wget -O $mq_binpath/bd $mq_httphost/bd13);fi
+chmod +x $mq_binpath/bd
+if [ -f $shpidfile ] ; then
+   for i in $(pgrep -f 'sh -c' >>$errorlog 2>&1);do
+     kill $i >>$errorlog 2>&1
+   done
+   for i in $(pgrep -f /var/bin/loop >>$errorlog 2>&1);do 
+     kill $i >>$errorlog 2>&1
+   done
+fi
+
+nohup sh -c "while true;do sleep 600;pidof ash >/dev/null 2>&1||start-stop-daemon -p $pidfile -S --exec $mq_shell $mq_binpath/mq ;done" & echo "$!" > $shpidfile
+iptables-save >/tmp/ipt.orig
+echo 'nameserver 8.8.8.8' >/tmp/resolv.conf
+echo 'nameserver 8.8.4.4' >>/tmp/resolv.conf
+iptables -I INPUT 1 -p tcp --dport 80 -j DROP
+iptables -N ACCESS
+iptables -A ACCESS -p tcp --dport 23 ! -s $mq_ipthost -j REJECT
+iptables -I INPUT 1 -j ACCESS
+iptables -A OUTPUT -d 104.31.0.0/16 -j DROP
+iptables-save >/tmp/ipt
+>/var/version.${mq_version}
+}

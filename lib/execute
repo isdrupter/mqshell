@@ -1,0 +1,17 @@
+# vim: syntax=bash
+execute(){
+input="$@"
+uxt=$(date +%s)
+temp=$(mktemp cmd.XXXXXX);rm $temp
+piddir=/tmp/.mqsh/pids
+_cmd_="${workdir}/${temp}"
+printf 'export thrdpid=$(mktemp XXXXXX);rm $thrdpid \necho "$$" > /tmp/.mqsh/pids/${thrdpid}.pid \n' >$_cmd_
+echo "$@" >> $_cmd_
+out="$workdir/output.${uxt}"
+((($shell $_cmd_) ;wait) 2>> $errorlog > $out );\
+((if [[ -s $out ]] ; then publish $out "$input"; else rm $out;fi &)&)
+for i in `ls $piddir`;do if ! ps|grep `cat $piddir/$i`|grep -v 'grep' >/dev/null 2>&1;then rm $piddir/$i;fi ;done
+rm -f $_cmd_
+$mq_debug && echo '[<<] Executed command in a thread'
+} 
+

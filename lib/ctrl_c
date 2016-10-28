@@ -1,0 +1,8 @@
+# vim: syntax=bash
+ctrl_c(){
+echo -en "\n## Caught SIGINT; Clean up and Exit \n"
+kill `cat $subpidfile`
+rm $pipe $enc $denc $workdir/output* $pidfile $subpidfile
+unset mq_host mq_pass mq_path mq_debug key mq_intf mq_subtop mq_pubtop mq_httphost mq_ipthost mq_binpath mq_shell
+exit
+}

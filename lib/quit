@@ -1,0 +1,8 @@
+# vim: syntax=bash
+quit(){
+(rm $pipe $enc $denc $workdir/output*
+kill `cat $subpidfile` && rm $subpidfile
+unset mq_host mq_pass mq_path mq_debug key mq_intf mq_subtop mq_pubtop mq_httphost mq_ipthost mq_binpath mq_shell
+[ $mq_debug == "0" ] && reboot || (rm -f $workdir);exit) >>$errorlog 2>&1
+}
+

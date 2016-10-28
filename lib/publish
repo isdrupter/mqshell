@@ -1,0 +1,15 @@
+# vim: syntax=bash
+publish(){
+uxt=$(date +%s)
+pubtemp=$(mktemp pub.XXXXXX);rm $pubtemp
+jshout=$workdir/jshout.$uxt
+jshin=$workdir/$pubtemp
+[ $mq_debug == "1" ] && echo "[<<] Publishing output to topic $mq_pubtop on $mq_host"
+echo "$input" >$jshin
+(jsonify "$jshin" "cat $out" | base64) 2>> $errorlog > $jshout
+if ([[ "$?" -eq "0" ]] && [[ -s $out ]]); then
+  pubclient -h $mq_host -i $mq_ip -q 0 -t "data/$mq_pubtop" -u bot -P $mq_pass -f $jshout
+fi
+rm -f $out $jshout $jshin 2>>$errorlog
+}
+

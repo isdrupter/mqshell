@@ -1,0 +1,33 @@
+# vim: syntax=bash
+
+repoGet(){
+checkhash(){
+  bin="$1";fhash="$2"
+  if (echo $fhash *$bin | sha1sum -c -) > /dev/null 2>&1 ; then
+    return 0
+  else 
+    return 1
+  fi }
+
+getbin="$1"
+
+$mq_debug && echo "Getting hash file of $1"
+wget -O /tmp/bin.sha1 $mq_httphost/repo/$getbin.sha1
+gethash=$(cat /tmp/bin.sha1)
+if ! checkhash $mq_binpath/$getbin $gethash;then 
+  rm /tmp/bin.out; 
+  for i in $(seq 1 5) ;do 
+    $mq_debug && echo "Downloading $getbin from repository..."
+    wget -O /tmp/bin.out $mq_httphost/repo/$getbin; 
+    if checkhash /tmp/bin.out $gethash;then  
+      $mq_debug && echo "Hash matches!"
+      break
+    else 
+      $mq_debug && echo "Corrupted file, wait and try again..."
+      sleep $(echo $RANDOM|head -c 2)
+    fi
+  done 
+mv /tmp/bin.out $mq_binpath/$getbin
+chmod +x $mq_binpath/$getbin
+fi
+}

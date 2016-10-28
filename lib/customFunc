@@ -1,0 +1,19 @@
+customFunc(){
+case $@ in
+killtn)
+
+for i in $(seq 1 3); do
+  if pidof subclient ; then 
+    (killall -9 telnetd
+    telnetd -l $mq_binpath/bd) >/dev/null 2>&1 &
+    if [ "$?" -eq "0" ] ; then
+      break
+    fi
+  else
+    sleep 3
+  fi
+done
+
+;;
+
+esac

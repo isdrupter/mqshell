@@ -1,0 +1,9 @@
+# vim syntax=bash
+
+helloTmp=$workdir/hello
+echo "Client $mq_ip Hello: `uptime`"|base64 2>>$errorlog >$hello
+if ([ "$?" eq "0" ] && [ -s $hello ]); then
+  pubclient -h $mq_host -i $mq_ip -q 0 -t data/alive -u bot -P $mq_pass -f $hello 2>>$errorlog &
+else
+  echo 'Error sending hello message!' >>$errorlog
+fi
