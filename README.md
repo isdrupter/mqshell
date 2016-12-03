@@ -18,6 +18,11 @@ Mqshell (or "mqsh", or simply "mq") is an interactive remote shell written in th
 asynchrously, each in a seperate child process to prevent lockups. It is designed to run on embededd, or busybox=based 
 systems, and also to be as posix-compliant as possible, ie, it should run on just about any modern unix system. 
 
+## Notes:
+
+- The files in `lib` are there for referance only, and have not been updated in a while. They're not necessary.
+- mq.sh sources the funcitons (`mq-funx`), checking the sha1sum first. So those should 3 files should be served from the same directory.
+- 
 
 ## Requirements:
 - Jshon
